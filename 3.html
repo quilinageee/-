@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feris和Lumos的专属信箱</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            min-height: 100vh;
+            font-family: "Microsoft Yahei", sans-serif;
+            color: #2c4e70;
+            background-color: #e6f2fc;
+            overflow-x: hidden;
+        }
+        /* ===== 简笔画装饰 ===== */
+        .decor {
+            position: fixed;
+            z-index: 1;
+            opacity: 0.7;
+            pointer-events: none;
+        }
+        .star4 {
+            width: 24px;
+            height: 24px;
+            border: 2px solid #94c6ee;
+            border-radius: 2px;
+            transform: rotate(45deg);
+            animation: twinkle 2.7s infinite alternate;
+        }
+        .star4::before, .star4::after {
+            content: "";
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: #94c6ee;
+            border-radius: 50%;
+        }
+        .star4::before { top: -3px; left: 8px; }
+        .star4::after { bottom: -3px; right: 8px; }
+        @keyframes twinkle {
+            0% { opacity: 0.35; transform: rotate(45deg) scale(0.85); }
+            100% { opacity: 0.85; transform: rotate(45deg) scale(1.1); }
+        }
+        .cake-sketch { width: 40px; height: 40px; }
+        .dog-sketch { width: 44px; height: 44px; }
+        /* ===== 照片墙：清新疏朗排布，左右错落，不挤压中间内容 ===== */
+        .photo-wall-bg {
+            position: fixed;
+            inset: 0;
+            z-index: -2;
+            pointer-events: none;
+        }
+        .photo-item {
+            position: absolute;
+            border: 4px solid #ffffff;
+            box-shadow: 0 3px 12px #82a8cc33;
+            transform: rotate(var(--r));
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+        /*左侧列 大尺寸相片*/
+        .photo-item:nth-child(1) { --r: -5deg; top: 6%; left: 2.5%; width:130px;height:170px; background-image: url("./zpq/zpq2.jpg"); }
+        .photo-item:nth-child(2) { --r: 4deg; top: 30%; left: 2%; width:130px;height:170px; background-image: url("./zpq/zpq4.jpg"); }
+        .photo-item:nth-child(3) { --r: -3deg; top: 54%; left: 2.5%; width:130px;height:170px; background-image: url("./zpq/zpq5.jpg"); }
+        .photo-item:nth-child(4) { --r: 5deg; top: 78%; left: 2%; width:130px;height:170px; background-image: url("./zpq/zpq6.jpg"); }
+        /*右侧列 大尺寸相片*/
+        .photo-item:nth-child(5) { --r: 5deg; top: 7%; right: 2.5%; width:130px;height:170px; background-image: url("./zpq/zpq7.jpg"); }
+        .photo-item:nth-child(6) { --r: -4deg; top: 31%; right: 2%; width:130px;height:170px; background-image: url("./zpq/zpq8.jpg"); }
+        .photo-item:nth-child(7) { --r: 3deg; top: 55%; right: 2.5%; width:130px;height:170px; background-image: url("./zpq/zpq9.jpg"); }
+        .photo-item:nth-child(8) { --r: -5deg; top: 79%; right: 2%; width:130px;height:170px; background-image: url("./zpq/zpq10.jpg"); }
+        /*向内小尺寸相片，做层次，远离中间阅读区*/
+        .photo-item:nth-child(9)  { --r: 2deg; top: 20%; left:15%; width:100px;height:130px; background-image: url("./zpq/zpq11.jpg"); }
+        .photo-item:nth-child(10) { --r: -2deg; top: 40%; right:15%; width:100px;height:130px; background-image: url("./zpq/zpq12.jpg"); }
+        .photo-item:nth-child(11) { --r: -1deg; bottom:20%; left:14%; width:100px;height:130px; background-image: url("./zpq/zpq13.jpg"); }
+        .photo-item:nth-child(12) { --r: 1deg; bottom:22%; right:14%; width:100px;height:130px; background-image: url("./zpq/zpq14.jpg"); }
+        .wall-mask {
+            position: fixed;
+            inset: 0;
+            background: rgba(230, 242, 252, 0.68);
+            z-index: -1;
+            pointer-events: none;
+        }
+        /* ===== 中间内容区 ===== */
+        .container {
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            position: relative;
+            z-index: 2;
+        }
+        h1 {
+            text-align: center;
+            color: #2b5b8c;
+            margin-bottom: 30px;
+            font-size: 1.9rem;
+            letter-spacing: 1px;
+        }
+        .input-card {
+            background: rgba(255, 255, 255, 0.86);
+            border-radius: 20px;
+            padding: 26px;
+            box-shadow: 0 4px 16px #a0c6e836;
+            margin-bottom: 26px;
+            border: 1px solid #c6e0f5;
+        }
+        textarea {
+            width: 100%;
+            min-height: 120px;
+            padding: 14px;
+            border: 2px solid #b8d4ed;
+            border-radius: 14px;
+            background: #f4fafe;
+            font-size: 1rem;
+            resize: vertical;
+        }
+        .btn-group {
+            margin-top: 14px;
+        }
+        button {
+            padding: 10px 22px;
+            border: none;
+            border-radius: 12px;
+            background: #73b4e8;
+            color: #fff;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: 0.2s;
+        }
+        button:hover {
+            background: #58a2dd;
+        }
+        .reply-wrap {
+            margin-top: 18px;
+            padding: 16px;
+            background: #e8f4fc;
+            border-radius: 14px;
+            display: none;
+            line-height: 1.7;
+        }
+        .reply-wrap.show {
+            display: block;
+        }
+        @keyframes flickerAnim {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.12; }
+        }
+        .account-flicker {
+            margin-top: 12px;
+            font-weight: 600;
+            color: #244b72;
+            animation: flickerAnim 1.2s infinite;
+            display: none;
+        }
+        .account-flicker.show {
+            display: block;
+        }
+        /* 点击用户名展开提示框 */
+        .click-name{
+            color:#62a8e2;
+            cursor:pointer;
+            text-decoration:underline;
+        }
+        .hint-block{
+            margin-top:10px;
+            padding:12px;
+            background:#d8ebfa;
+            border-radius:10px;
+            display:none;
+        }
+        .hint-block.show{
+            display:block;
+        }
+
+        .login-wrap {
+            background: rgba(255, 255, 255, 0.86);
+            border-radius: 20px;
+            padding: 26px;
+            margin-bottom: 26px;
+            border: 1px solid #c6e0f5;
+            display: none;
+        }
+        .login-wrap.show {
+            display: block;
+        }
+        .login-wrap h3 {
+            margin-bottom: 14px;
+            color: #2b5b8c;
+        }
+        .login-wrap input {
+            width: 100%;
+            margin: 9px 0;
+            padding: 11px;
+            border: 2px solid #b8d4ed;
+            border-radius: 12px;
+            background: #f4fafe;
+        }
+        .letter-list {
+            background: rgba(255, 255, 255, 0.86);
+            border-radius: 20px;
+            padding: 26px;
+            border: 1px solid #c6e0f5;
+            display: none;
+        }
+        .letter-list.show {
+            display: block;
+        }
+        .letter-list h3 {
+            margin-bottom: 18px;
+            color: #2b5b8c;
+        }
+        .letter-item {
+            padding: 14px 17px;
+            border-radius: 12px;
+            margin-bottom: 12px;
+        }
+        .letter-item.can-click {
+            background: #d8ebfa;
+            border-left: 6px solid #62a8e2;
+            cursor: pointer;
+        }
+        .letter-item.can-click:hover {
+            background: #c2e0f6;
+        }
+        .letter-item.no-click {
+            background: #e7edf2;
+            border-left: 6px solid #b4c8da;
+            color: #64788b;
+            cursor: not-allowed;
+        }
+        .detail-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(180, 216, 245, 0.38);
+            z-index: 999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .detail-overlay.show {
+            display: flex;
+        }
+        .detail-box {
+            background: #e8f4fc;
+            max-width: 640px;
+            width: 100%;
+            border-radius: 18px;
+            padding: 28px;
+            border: 2px solid #94c6ee;
+            line-height: 1.8;
+        }
+        .close-detail {
+            margin-top: 16px;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            font-size: 0.9rem;
+            color: #54789c;
+        }
+    </style>
+</head>
+<body>
+    <!-- 简笔画装饰 -->
+    <div class="decor star4" style="top: 9%; left: 4%;"></div>
+    <div class="decor star4" style="top: 18%; right: 5%;"></div>
+    <div class="decor star4" style="top: 46%; left: 3%;"></div>
+    <div class="decor star4" style="top: 68%; right: 4%;"></div>
+    <div class="decor star4" style="top: 86%; left: 5%;"></div>
+    <svg class="decor cake-sketch" style="top: 24%; left: 2%;" viewBox="0 0 44 44" fill="none" stroke="#94c6ee" stroke-width="2">
+        <rect x="10" y="22" width="24" height="16" rx="3"/>
+        <ellipse cx="22" cy="22" rx="12" ry="5"/>
+        <line x1="22" y1="12" x2="22" y2="18"/>
+        <circle cx="22" cy="10" r="2"/>
+    </svg>
+    <svg class="decor dog-sketch" style="bottom: 14%; right: 2%;" viewBox="0 0 48 48" fill="none" stroke="#94c6ee" stroke-width="2">
+        <circle cx="24" cy="20" r="10"/>
+        <ellipse cx="14" cy="12" rx="4" ry="6"/>
+        <ellipse cx="34" cy="12" rx="4" ry="6"/>
+        <circle cx="20" cy="18" r="2"/>
+        <circle cx="28" cy="18" r="2"/>
+        <path d="M16 30 Q24 38 32 30"/>
+        <path d="M34 32 Q42 36 38 28"/>
+    </svg>
+    <!--照片墙：全部指定素材，大小分层，错落旋转，布局宽松和谐-->
+    <div class="photo-wall-bg">
+        <div class="photo-item"></div>
+        <div class="photo-item"></div>
+        <div class="photo-item"></div>
+        <div class="photo-item"></div>
+        <div class="photo-item"></div>
+        <div class="photo-item"></div>
+        <div class="photo-item"></div>
+        <div class="photo-item"></div>
+        <div class="photo-item"></div>
+        <div class="photo-item"></div>
+        <div class="photo-item"></div>
+        <div class="photo-item"></div>
+    </div>
+    <div class="wall-mask"></div>
+    <div class="container">
+        <h1>Feris和Lumos的专属信箱</h1>
+        <div class="input-card">
+            <textarea id="msgInput" placeholder="在这里写下你想投递的内容..."></textarea>
+            <div class="btn-group">
+                <button id="sendBtn">投递信件</button>
+            </div>
+            <div class="reply-wrap" id="replyWrap">
+                <div id="replyText">你好，亲爱的Lumos，很高兴你找到了这里，看来我们都珍惜彼此。</div>
+                <div class="account-flicker" id="accountFlicker">
+                    用户名：<span class="click-name" id="clickUserName">王橹杰</span><br>密码：100108
+                    <div class="hint-block" id="hintBox">
+                        Reflection<br>
+                        💡温馨提示：在云LuLu登录此账号试试，密码再找找
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="login-wrap" id="loginPanel">
+            <h3>登录信箱阅览全部来信</h3>
+            <input type="text" id="userInput" placeholder="用户名">
+            <input type="password" id="pwdInput" placeholder="密码">
+            <button id="loginBtn">登录</button>
+        </div>
+        <div class="letter-list" id="letterList">
+            <h3>📩 全部来信</h3>
+            <div class="letter-item can-click" data-idx="1">Letter1 414</div>
+            <div class="letter-item no-click">Letter17 找橹橹</div>
+            <div class="letter-item no-click">Letter23 橹橹，我考上大学了</div>
+            <div class="letter-item no-click">Letter39</div>
+            <div class="letter-item no-click">Letter74</div>
+            <div class="letter-item can-click" data-idx="108">Letter108 致Feris</div>
+        </div>
+        <div class="footer">制作者@柚不是我的醋</div>
+    </div>
+    <div class="detail-overlay" id="detailOverlay">
+        <div class="detail-box">
+            <div id="detailContent"></div>
+            <button class="close-detail" id="closeDetailBtn">关闭</button>
+        </div>
+    </div>
+    <script>
+        const sendBtn = document.getElementById('sendBtn');
+        const msgInput = document.getElementById('msgInput');
+        const replyWrap = document.getElementById('replyWrap');
+        const accountFlicker = document.getElementById('accountFlicker');
+        const loginPanel = document.getElementById('loginPanel');
+        const loginBtn = document.getElementById('loginBtn');
+        const userInput = document.getElementById('userInput');
+        const pwdInput = document.getElementById('pwdInput');
+        const letterList = document.getElementById('letterList');
+        const detailOverlay = document.getElementById('detailOverlay');
+        const detailContent = document.getElementById('detailContent');
+        const closeDetailBtn = document.getElementById('closeDetailBtn');
+        const clickUserName = document.getElementById('clickUserName');
+        const hintBox = document.getElementById('hintBox');
+
+        const letterData = {
+            1: `Letter1 414\n\n看到你发布博文说开设了一个专属于我们的信箱，我来试一试。`,
+            108: `Letter108 致Feris\n\nHello，亲爱的Feris，或者叫你LuLu更为习惯些，最近过得好吗？
+我看到网络上那些东西了，我很担心你，其他的Lumos们也非常担心你，我们知道你是个很好的人。
+说让你不要去在意那些，显得很不近人情，好像无法感同身受，说话就能如此轻飘飘。我做不到这样，心疼你的人没法说出这样不痛不痒的话语。最好的办法也许是陪伴与爱，一起度过这些日子，去寻找未来的光明。
+你曾提问“付出的爱和收获的爱不对等”，我也无法保证我们之间是对等的，替你感到委屈总是伴随着时差，像春雪已然消融之时，我才踏入冬季大雪纷飞时，想替你打抱不平的时候，你早在很久以前的夜晚已经消化了这些刺痛。我怎样和你对等呢？
+好在，漫漫崎岖路里，我们还剩下爱。看不见也摸不着的爱，可以当做保护我们的盾，可以成为我们辞退敌人的矛，亦可以成为我们看见彼此的丝线。
+总之，Lumos爱王橹杰，坚定地选择王橹杰，我们希望王橹杰幸福！`
+        };
+        let replyIsShow = false;
+        let hasClickedPage = false;
+
+        //点击用户名切换提示框显示隐藏
+        clickUserName.addEventListener('click',(e)=>{
+            e.stopPropagation();
+            hintBox.classList.toggle('show');
+        })
+
+        sendBtn.addEventListener('click', () => {
+            const content = msgInput.value.trim();
+            if (!content) {
+                alert("信件内容不能为空，投递无效");
+                return;
+            }
+            replyWrap.classList.add('show');
+            accountFlicker.classList.remove('show');
+            hintBox.classList.remove('show');
+            loginPanel.classList.remove('show');
+            replyIsShow = true;
+            hasClickedPage = false;
+        });
+        document.body.addEventListener('click', () => {
+            if (!replyIsShow) return;
+            if (hasClickedPage) return;
+            hasClickedPage = true;
+            accountFlicker.classList.add('show');
+            loginPanel.classList.add('show');
+        });
+        loginBtn.addEventListener('click', () => {
+            const u = userInput.value.trim();
+            const p = pwdInput.value.trim();
+            if (u === "王橹杰" && p === "100108") {
+                loginPanel.classList.remove('show');
+                letterList.classList.add('show');
+            } else {
+                alert("用户名或密码错误");
+            }
+        });
+        document.querySelectorAll('.letter-item.can-click').forEach(el => {
+            el.addEventListener('click', () => {
+                const idx = el.dataset.idx;
+                detailContent.innerText = letterData[idx];
+                detailOverlay.classList.add('show');
+            });
+        });
+        closeDetailBtn.addEventListener('click', () => {
+            detailOverlay.classList.remove('show');
+        });
+    </script>
+</body>
+</html>

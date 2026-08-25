@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>云LuLu - 治愈甜品小铺</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+        }
+        :root {
+            --sky-light: #d4eaf8;
+            --sky-main: #96cced;
+            --sky-dark: #44789c;
+            --cream: #fffbf2;
+        }
+        body {
+            background-color: var(--sky-light);
+            background-image:
+                url("data:image/svg+xml,%3Csvg width='120' height='120' viewBox='0 0 120 120' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M20,20 l4,8 l8,4 l-8, -4 l-4, -8' fill='%23ffffff33'/%3E%3C/svg%3E");
+            min-height: 100vh;
+        }
+        .decor-cloud {
+            position: absolute;
+            opacity: 0.6;
+            z-index: 0;
+        }
+        .star-four {
+            position:absolute;
+            width:32px;height:32px;
+            background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 0L14 10L24 12L14 14L12 24L10 14L0 12L10 10Z' fill='%23508bb8'/%3E%3C/svg%3E");
+            background-size:contain;
+            background-repeat:no-repeat;
+            opacity:0.7;
+        }
+        .violin-deco {
+            position:absolute;
+            width:70px;height:70px;
+            background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M30,70 Q40,40 60,30 Q80,45 72,70 Q55,90 30,70 Z' stroke='%23335c7a' fill='none' stroke-width='2'/%3E%3Cpath d='M62,32 L78,16' stroke='%23335c7a' stroke-width='2'/%3E%3C/svg%3E");
+            background-repeat:no-repeat;
+            opacity:0.55;
+        }
+        header {
+            position:relative;
+            z-index:2;
+            padding:24px 16px;
+            text-align:center;
+        }
+        h1 {
+            font-size:42px;
+            color:var(--sky-dark);
+            letter-spacing:4px;
+        }
+        .header-bar {
+            max-width:900px;
+            margin:0 auto;
+            display:flex;
+            flex-wrap:wrap;
+            gap:12px;
+            justify-content:center;
+            align-items:center;
+            margin-top:16px;
+        }
+        .search-wrap {
+            flex:1;
+            min-width:260px;
+            position:relative;
+        }
+        #search-input {
+            width:100%;
+            padding:11px 16px;
+            border-radius:24px;
+            border:2px solid var(--sky-main);
+            font-size:15px;
+            background:#fff;
+        }
+        #search-input:disabled {
+            background:#e8edf1;
+            color:#888;
+        }
+        .tip-login {
+            font-size:12px;
+            color:#c04848;
+            margin-top:4px;
+        }
+        .btn {
+            padding:10px 20px;
+            border-radius:22px;
+            border:none;
+            cursor:pointer;
+            background:var(--sky-main);
+            color:#0f2b3f;
+            font-weight:500;
+        }
+        .btn:hover {
+            background:#7bb8dd;
+        }
+        main {
+            max-width:920px;
+            margin:0 auto 60px;
+            position:relative;
+            z-index:2;
+            padding:0 16px;
+        }
+        /*店铺介绍面板*/
+        .shop-intro{
+            background:#fffbf2;
+            border:1px solid #b8d7ec;
+            border-radius:16px;
+            padding:20px;
+            margin-bottom:24px;
+            line-height:1.7;
+            color:#2b5573;
+            display:none;
+        }
+        /*王橹杰人物信息面板*/
+        .person-intro{
+            background:#fffbf2;
+            border:1px solid #b8d7ec;
+            border-radius:16px;
+            padding:20px;
+            margin-bottom:24px;
+            line-height:1.8;
+            color:#2b5573;
+            display:none;
+        }
+        .person-img{
+            width:180px;
+            border-radius:12px;
+            margin-bottom:14px;
+        }
+        .underline-bold{
+            text-decoration: underline;
+            font-weight:bold;
+        }
+        .mailbox-click{
+            cursor:pointer;
+            text-decoration: underline;
+            font-weight:bold;
+            color:#285780;
+        }
+        .hint-block{
+            margin-top:14px;
+            padding:10px;
+            background:#e8f4fc;
+            border-radius:10px;
+            font-size:14px;
+        }
+        .section-title {
+            font-size:24px;
+            margin:32px 0 16px;
+            color:#2b5573;
+            border-left:5px solid var(--sky-dark);
+            padding-left:10px;
+        }
+        .grid-menu {
+            display:grid;
+            grid-template-columns:repeat(auto-fill, minmax(260px,1fr));
+            gap:18px;
+        }
+        .item-card {
+            background:var(--cream);
+            border-radius:16px;
+            padding:16px;
+            border:1px solid #b8d7ec;
+            box-shadow: 0 3px 8px #00000012;
+        }
+        .item-card.clue-card{
+            cursor:pointer;
+        }
+        .item-img{
+            width:100%;
+            height:160px;
+            border-radius:12px;
+            object-fit:cover;
+            margin-bottom:12px;
+        }
+        .item-name {
+            font-size:17px;
+            font-weight:500;
+            color:#203e54;
+        }
+        .item-price {
+            color:#c04848;
+            margin:6px 0;
+        }
+        .item-desc {
+            font-size:13px;
+            color:#546b7c;
+        }
+        footer {
+            background:#284a63;
+            color:#e7f2fa;
+            padding:30px 16px;
+            text-align:center;
+            font-size:14px;
+        }
+        footer a {
+            color:#9cd2f2;
+        }
+        .modal {
+            position:fixed;
+            inset:0;
+            background:#00000055;
+            display:none;
+            z-index:100;
+            align-items:center;
+            justify-content:center;
+        }
+        .modal-box {
+            background:#fff;
+            padding:28px;
+            border-radius:16px;
+            width:min(90%,360px);
+        }
+        .modal-box h3 {
+            margin-bottom:12px;
+            color:#24465e;
+        }
+        .modal-box input {
+            width:100%;
+            padding:10px;
+            margin:8px 0;
+            border:1px solid #b0cce0;
+            border-radius:8px;
+        }
+        .modal-buttons {
+            margin-top:14px;
+            display:flex;
+            gap:10px;
+            justify-content:flex-end;
+        }
+        .switch-text{
+            margin-top:12px;
+            text-align:center;
+            font-size:13px;
+            color:#44789c;
+            cursor:pointer;
+        }
+        .hint-text{
+            font-size:12px;
+            color:#577991;
+            line-height:1.6;
+            background:#e8f4fc;
+            padding:8px;
+            border-radius:8px;
+            margin-bottom:10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="star-four" style="top:60px;left:8%;"></div>
+    <div class="star-four" style="top:140px;right:10%;"></div>
+    <div class="star-four" style="top:420px;left:4%;"></div>
+    <div class="star-four" style="top:650px;right:6%;"></div>
+    <div class="violin-deco" style="top:120px;right:4%;transform:rotate(12deg);"></div>
+    <div class="violin-deco" style="bottom:180px;left:3%;transform:rotate(-18deg);"></div>
+    <header>
+        <h1>云LuLu</h1>
+        <div class="header-bar">
+            <div class="search-wrap">
+                <input id="search-input" disabled placeholder="登录后才可搜索菜单...">
+                <div class="tip-login" id="search-tip">🔒 需要登录解锁搜索功能</div>
+            </div>
+            <button class="btn" id="login-btn">登录</button>
+            <button class="btn" id="logout-btn" style="display:none;">退出登录</button>
+        </div>
+    </header>
+    <main>
+        <!--云LuLu搜索介绍面板-->
+        <div class="shop-intro" id="shopIntro">
+            <p><strong>云 LuLu</strong> —— 一口云朵般的甜，治愈每一个平凡日常。</p>
+            <p>我们是一家藏在街角的治愈系奶茶甜品店，以 "云" 为名，愿每一杯饮品、每一块甜点都像云朵般轻盈柔软，为你卸下一天的疲惫。</p>
+            <p>店内精心呈现 10 款创意饮品 与 10 款手作甜品：从海盐冰奶的清爽、青提茉莉冰的芬芳，到生椰拿铁的醇厚、草莓奶昔的甜蜜，每一口都是季节与心意的碰撞；甜品端更有网红 <strong>迪拜巧克力软曲奇</strong>（<strong>开心果味</strong> / 芝士 / 莓果多口味）、绵密浓郁的 Tiramisu、萌趣十足的 小狗巴斯克，以及招牌 云朵蛋糕—— 松软如云，入口即化。</p>
+            <p>人均仅需 10—22 元，就能拥有一份触手可及的小确幸。无论是午后小憩、朋友小聚，还是想给自己一点甜，云 LuLu 都在这里，等你落座。</p>
+            <p>店主推荐：曾经有个明星来光顾过，好像叫<strong>王橹杰</strong></p>
+        </div>
+        <!--王橹杰人物信息面板-->
+        <div class="person-intro" id="personIntro">
+            <img class="person-img" src="./picture/王橹杰.jpg" alt="王橹杰">
+            <p>王橹杰的微博：<a href="https://weibo.com/u/3625607515" target="_blank">https://weibo.com/u/3625607515</a></p>
+            <p>王橹杰的五签打卡地址：<a href="https://wljlumos.top/#/" target="_blank">https://wljlumos.top/#/</a></p>
+            <p>王橹杰，英文名为<strong>Feris</strong>，<strong>2010年1月8日出生</strong>，TF家族成员。</p>
+            <p>2022年10月起，王橹杰以TF家族第四代练习生身份参加自制综艺及各类演出活动。2024年10月5日，随团体发行EP《危险的关系OST》，演唱其中的《浪漫纯属虚构》《落日只会道别》两首歌。2025年7月11日，演唱的团体歌曲《心动》上线；7月12日至13日，参加TF家族夏日运动会；12月21日，团体单曲《适合，不适合》上线；12月26日至28日，王橹杰参加在海南三亚举办“荣耀”2026新年音乐会。</p>
+            <p>2026年7月6日，发行单曲《全世界陪我出发》。8月16日，领衔主演的青春校园剧《我们的少年时代2》播出，饰演付彬言。</p>
+            <p>曾公开表示自己喜欢<strong>迪拜巧克力软曲奇</strong>，并倾情推荐给粉丝。</p>
+            <p class="mailbox-click" id="mailboxElem">👆Feris和Lumos的专属信箱【此处为虚拟信箱】（请点击）</p>
+            <div class="hint-block">
+                温馨提示：<br>
+                1.注意加粗部分<br>
+                2.当你登录王橹杰账户的时候，点击他最喜欢的甜品，也许会找到一些线索
+            </div>
+        </div>
+        <h2 class="section-title">🥤 饮品</h2>
+        <div class="grid-menu" id="drink-list">
+            <div class="item-card">
+                <img class="item-img" src="./menup/海盐冰奶.jpg">
+                <div class="item-name">海盐冰奶</div>
+                <div class="item-price">12元 / 大杯16元</div>
+                <div class="item-desc">咸香柔和冰奶，清爽治愈</div>
+            </div>
+            <div class="item-card">
+                <img class="item-img" src="./menup/蜜桃乌龙.jpg">
+                <div class="item-name">蜜桃乌龙</div>
+                <div class="item-price">13元 / 大杯17元</div>
+                <div class="item-desc">蜜桃果香搭配乌龙茶底</div>
+            </div>
+            <div class="item-card">
+                <img class="item-img" src="./menup/草莓奶昔.jpg">
+                <div class="item-name">草莓奶昔</div>
+                <div class="item-price">14元 / 大杯19元</div>
+                <div class="item-desc">新鲜草莓绵密奶昔</div>
+            </div>
+            <div class="item-card">
+                <img class="item-img" src="./menup/青提茉莉冰.jpg">
+                <div class="item-name">青提茉莉冰</div>
+                <div class="item-price">14元 / 大杯18元</div>
+                <div class="item-desc">青提清甜搭配茉莉花香</div>
+            </div>
+            <div class="item-card">
+                <img class="item-img" src="./menup/芒果西米露.jpg">
+                <div class="item-name">芒果西米露</div>
+                <div class="item-price">12元 / 大杯17元</div>
+                <div class="item-desc">香甜芒果搭配Q弹西米</div>
+            </div>
+            <div class="item-card">
+                <img class="item-img" src="./menup/红豆奶茶.jpg">
+                <div class="item-name">红豆奶茶</div>
+                <div class="item-price">10元 / 大杯14元</div>
+                <div class="item-desc">绵密红豆，温润奶茶</div>
+            </div>
+            <div class="item-card">
+                <img class="item-img" src="./menup/葡萄冰奶.jpg">
+                <div class="item-name">葡萄冰奶</div>
+                <div class="item-price">13元 / 大杯17元</div>
+                <div class="item-desc">浓郁葡萄果香搭配丝滑冰奶</div>
+            </div>
+            <div class="item-card">
+                <img class="item-img" src="./menup/生椰拿铁.jpg">
+                <div class="item-name">生椰拿铁</div>
+                <div class="item-price">14元 / 大杯18元</div>
+                <div class="item-desc">椰香醇厚拿铁咖啡</div>
+            </div>
+            <div class="item-card">
+                <img class="item-img" src="./menup/柠檬气泡水.jpg">
+                <div class="item-name">柠檬气泡水</div>
+                <div class="item-price">12元 / 大杯16元</div>
+                <div class="item-desc">清爽柠檬气泡，解腻消暑</div>
+            </div>
+            <div class="item-card">
+                <img class="item-img" src="./menup/抹茶拿铁.jpg">
+                <div class="item-name">抹茶拿铁</div>
+                <div class="item-price">14元 / 大杯18元</div>
+                <div class="item-desc">日式抹茶丝滑拿铁</div>
+            </div>
+        </div>
+        <h2 class="section-title">🍰 甜品</h2>
+        <div class="grid-menu" id="dessert-list">
+            <div class="item-card clue-card" id="targetClueCard">
+                <img class="item-img" src="./menup/迪拜巧克力软曲奇开心果味.jpg">
+                <div class="item-name">迪拜巧克力软曲奇·开心果味</div>
+                <div class="item-price">18元</div>
+                <div class="item-desc">浓郁巧克力开心果软曲奇</div>
+            </div>
+            <div class="item-card">
+                <img class="item-img" src="./menup/迪拜巧克力软曲奇芝士味.jpg">
+                <div class="item-name">迪拜巧克力软曲奇·芝士味</div>
+                <div class="item-price">18元</div>
+                <div class="item-desc">芝士风味迪拜巧克力曲奇</div>
+            </div>
+            <div class="item-card">
+                <img class="item-img" src="./menup/迪拜巧克力软曲奇莓果味.jpg">
+                <div class="item-name">迪拜巧克力软曲奇·莓果味</div>
+                <div class="item-price">18元</div>
+                <div class="item-desc">酸甜莓果巧克力软曲奇</div>
+            </div>
+            <div class="item-card">
+                <img class="item-img" src="./menup/提拉米苏.jpg">
+                <div class="item-name">提拉米苏</div>
+                <div class="item-price">22元</div>
+                <div class="item-desc">经典意式提拉米苏</div>
+            </div>
+            <div class="item-card">
+                <img class="item-img" src="./menup/小狗巴斯克.jpg">
+                <div class="item-name">小狗巴斯克</div>
+                <div class="item-price">20元</div>
+                <div class="item-desc">软心焦香巴斯克蛋糕</div>
+            </div>
+            <div class="item-card">
+                <img class="item-img" src="./menup/云朵蛋糕.jpg">
+                <div class="item-name">云朵蛋糕</div>
+                <div class="item-price">20元 /切块16元</div>
+                <div class="item-desc">像云朵一样轻盈绵软蛋糕</div>
+            </div>
+        </div>
+    </main>
+    <div class="modal" id="login-modal">
+        <div class="modal-box">
+            <h3>登录云LuLu</h3>
+            <div class="hint-text">
+                💡温馨提示<br/>
+                1.登录后即可点单<br/>
+                2.登录后即可解锁菜单搜索栏<br/>
+                3.不记得密码的话可以试一试自己的名字缩写（小写）加生日年月日
+            </div>
+            <input placeholder="账号" id="acc">
+            <input placeholder="密码" type="password" id="pwd">
+            <div class="modal-buttons">
+                <button class="btn" id="cancel-login">取消</button>
+                <button class="btn" id="confirm-login">确认登录</button>
+            </div>
+            <div class="switch-text" id="toRegister">没有账号？点击注册</div>
+        </div>
+    </div>
+    <div class="modal" id="register-modal">
+        <div class="modal-box">
+            <h3>注册云LuLu账号</h3>
+            <div class="hint-text">
+                💡温馨提示<br/>
+                1.登录后即可点单<br/>
+                2.登录后即可解锁菜单搜索栏<br/>
+                3.不记得密码的话可以试一试自己的名字缩写（小写）加生日年月日
+            </div>
+            <input placeholder="设置账号" id="regAcc">
+            <input placeholder="设置密码" type="password" id="regPwd">
+            <input placeholder="确认密码" type="password" id="regPwd2">
+            <div class="modal-buttons">
+                <button class="btn" id="cancel-register">取消</button>
+                <button class="btn" id="confirm-register">完成注册</button>
+            </div>
+            <div class="switch-text" id="toLogin">已有账号？去登录</div>
+        </div>
+    </div>
+    <footer>
+        <p>店铺电话：108XXXXXXXX</p>
+        <p>官方网站：<a href="https://www.yunlulu.com">www.yunlulu.com</a></p>
+        <p style="margin-top:8px;">营业时间：每日10:00‑21:00 | 到店&外卖均可</p>
+        <p style="margin-top:12px;">制作者：@柚不是我的醋</p>
+        <p style="margin-top:8px;font-size:12px;opacity:0.7;">©2026 云LuLu甜品小铺</p>
+    </footer>
+    <script>
+        const loginModal = document.getElementById('login-modal');
+        const registerModal = document.getElementById('register-modal');
+        const loginBtn = document.getElementById('login-btn');
+        const logoutBtn = document.getElementById('logout-btn');
+        const cancelLogin = document.getElementById('cancel-login');
+        const confirmLogin = document.getElementById('confirm-login');
+        const cancelRegister = document.getElementById('cancel-register');
+        const confirmRegister = document.getElementById('confirm-register');
+        const toRegister = document.getElementById('toRegister');
+        const toLogin = document.getElementById('toLogin');
+        const searchInput = document.getElementById('search-input');
+        const searchTip = document.getElementById('search-tip');
+        const shopIntro = document.getElementById('shopIntro');
+        const personIntro = document.getElementById('personIntro');
+        const targetClueCard = document.getElementById('targetClueCard');
+        const mailboxElem = document.getElementById('mailboxElem');
+        let isLogin = false;
+        let currentAccount = "";
+        let userDB = JSON.parse(localStorage.getItem("yunlulu_user")) || {};
+        //初始化NPC账号
+        if(!userDB["Feris"]){
+            userDB["Feris"] = "wlj20100108";
+        }
+        if(!userDB["Reflection"]){
+            userDB["Reflection"] = "Lumos Maxima";
+        }
+        localStorage.setItem("yunlulu_user",JSON.stringify(userDB));
+
+        loginBtn.onclick = ()=> loginModal.style.display='flex';
+        cancelLogin.onclick = ()=> loginModal.style.display='none';
+        toRegister.onclick = ()=>{
+            loginModal.style.display='none';
+            registerModal.style.display='flex';
+        }
+        toLogin.onclick = ()=>{
+            registerModal.style.display='none';
+            loginModal.style.display='flex';
+        }
+        cancelRegister.onclick = ()=> registerModal.style.display='none';
+        confirmRegister.onclick = ()=>{
+            const regAcc = document.getElementById('regAcc').value.trim();
+            const regPwd = document.getElementById('regPwd').value.trim();
+            const regPwd2 = document.getElementById('regPwd2').value.trim();
+            //禁止注册NPC账号Feris、Reflection
+            if(regAcc.toLowerCase() === "feris" || regAcc === "Reflection"){
+                alert("该账号为NPC专属账号，不可注册！");
+                return;
+            }
+            if(!regAcc||!regPwd||!regPwd2){
+                alert("请完整填写注册信息");
+                return;
+            }
+            if(regPwd !== regPwd2){
+                alert("两次输入密码不一致");
+                return;
+            }
+            if(userDB[regAcc]){
+                alert("该账号已被注册");
+                return;
+            }
+            userDB[regAcc] = regPwd;
+            localStorage.setItem("yunlulu_user",JSON.stringify(userDB));
+            alert("注册成功，请登录！");
+            registerModal.style.display='none';
+            loginModal.style.display='flex';
+        }
+        confirmLogin.onclick = ()=>{
+            const acc = document.getElementById('acc').value.trim();
+            const pwd = document.getElementById('pwd').value.trim();
+            if(!acc || !pwd){
+                alert("请输入账号密码");
+                return;
+            }
+            if(!userDB[acc] || userDB[acc]!==pwd){
+                alert("账号或密码错误");
+                return;
+            }
+            isLogin = true;
+            currentAccount = acc;
+            loginModal.style.display='none';
+            
+            //Reflection账号登录直接跳转4.html
+            if(currentAccount === "Reflection"){
+                window.location.href = "./4.html";
+                return;
+            }
+
+            loginBtn.style.display='none';
+            logoutBtn.style.display='block';
+            searchInput.disabled = false;
+            searchInput.placeholder = "不知道搜索什么的话可以试试“云LuLu”";
+            searchTip.innerText = "✅搜索已解锁，可以查找菜品";
+            searchTip.style.color="#238844";
+        }
+        logoutBtn.onclick = ()=>{
+            isLogin = false;
+            currentAccount = "";
+            loginBtn.style.display='block';
+            logoutBtn.style.display='none';
+            searchInput.disabled = true;
+            searchInput.value="";
+            searchInput.placeholder = "登录后才可搜索菜单...";
+            searchTip.innerText = "🔒 需要登录解锁搜索功能";
+            searchTip.style.color="#c04848";
+            shopIntro.style.display = "none";
+            personIntro.style.display = "none";
+        }
+        //开心果曲奇点击事件，跳转路径 ./2.html
+        targetClueCard.onclick = function(){
+            if(isLogin && currentAccount === "Feris"){
+                window.location.href = "./2.html";
+            }else if(!isLogin){
+                alert("请先登录账号！");
+            }else{
+                alert("暂无更多线索。");
+            }
+        }
+        //虚拟信箱点击逻辑
+        mailboxElem.onclick = function(){
+            if(isLogin && currentAccount === "Feris"){
+                window.location.href = "./3.html";
+            }else{
+                alert("请登录正确用户后点击");
+            }
+        }
+        const allCards = Array.from(document.querySelectorAll('.item-card'));
+        searchInput.addEventListener('input', function(){
+            const kw = this.value.trim().toLowerCase();
+            shopIntro.style.display = "none";
+            personIntro.style.display = "none";
+            //搜索云lulu
+            if(kw === "yunlulu" || kw === "云lulu"){
+                shopIntro.style.display = "block";
+                allCards.forEach(card=>card.style.display="block");
+            }
+            //搜索王橹杰
+            else if(kw === "王橹杰" || kw === "wanglujie"){
+                personIntro.style.display = "block";
+                allCards.forEach(card=>card.style.display="block");
+            }else{
+                if(kw === ""){
+                    allCards.forEach(card=>card.style.display="block");
+                }else{
+                    allCards.forEach(card=>{
+                        const name = card.querySelector('.item-name').innerText.toLowerCase();
+                        card.style.display = name.includes(kw) ? 'block' : 'none';
+                    })
+                }
+            }
+        })
+    </script>
+</body>
+</html>

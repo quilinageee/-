@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>找橹橹成功（小字：点击页面获得结局）</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            min-height: 100vh;
+            background-color: #e6f2fc;
+            font-family: "Microsoft Yahei", sans-serif;
+            overflow-x: hidden;
+            cursor: pointer;
+            position: relative;
+        }
+
+        /* 四芒星简笔画 */
+        .star4 {
+            position: absolute;
+            width: 22px;
+            height: 22px;
+            border: 2px solid #94c6ee;
+            border-radius: 2px;
+            transform: rotate(45deg);
+            opacity: 0.65;
+            animation: twinkle 3s infinite alternate;
+            pointer-events: none;
+        }
+        .star4::before, .star4::after {
+            content: "";
+            position: absolute;
+            width: 5px;
+            height: 5px;
+            background: #94c6ee;
+            border-radius: 50%;
+        }
+        .star4::before { top: -2px; left: 8px; }
+        .star4::after { bottom: -2px; right: 8px; }
+
+        @keyframes twinkle {
+            0% { opacity: 0.3; transform: rotate(45deg) scale(0.8); }
+            100% { opacity: 0.75; transform: rotate(45deg) scale(1.05); }
+        }
+
+        /* 云朵简笔画svg */
+        .cloud-sketch {
+            position: absolute;
+            stroke: #94c6ee;
+            stroke-width: 2;
+            fill: none;
+            opacity: 0.55;
+            pointer-events: none;
+        }
+
+        /* 头部标题 */
+        .page-title-wrap {
+            padding-top: 40px;
+            text-align: center;
+        }
+        .main-title {
+            font-size: 1.8rem;
+            color: #2b5b8c;
+        }
+        .sub-title {
+            font-size: 0.95rem;
+            color: #54789c;
+            margin-top: 6px;
+        }
+
+        /* 中心内容容器 */
+        .center-wrap {
+            min-height: calc(100vh - 140px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .opening-text {
+            font-size: 1.4rem;
+            color: #2b5b8c;
+            margin-bottom: 24px;
+            opacity: 0;
+            transition: opacity 1.2s ease-in-out;
+            text-align: center;
+        }
+        .opening-text.show {
+            opacity: 1;
+        }
+
+        /* 图片 渐显 */
+        .main-img {
+            width: 280px;
+            max-width: 85%;
+            border-radius: 16px;
+            box-shadow: 0 4px 14px #82a8cc40;
+            opacity: 0;
+            transition: opacity 1.2s ease-in-out;
+            margin-bottom: 24px;
+        }
+        .main-img.show {
+            opacity: 1;
+        }
+
+        /* 文字 依次渐显 */
+        .text-item {
+            font-size: 1.3rem;
+            color: #2b5b8c;
+            margin:10px 0;
+            opacity:0;
+            transition: opacity 1.2s ease-in-out;
+            text-align:center;
+        }
+        .text-item.show{
+            opacity:1;
+        }
+
+        /* 页脚 */
+        .footer {
+            position: fixed;
+            bottom:18px;
+            width:100%;
+            text-align:center;
+            font-size:0.9rem;
+            color:#54789c;
+            pointer-events:none;
+        }
+    </style>
+</head>
+<body>
+    <!-- 四芒星装饰 -->
+    <div class="star4" style="top:12%;left:8%;"></div>
+    <div class="star4" style="top:22%;right:10%;"></div>
+    <div class="star4" style="top:45%;left:6%;"></div>
+    <div class="star4" style="top:60%;right:7%;"></div>
+    <div class="star4" style="top:82%;left:11%;"></div>
+
+    <!--云朵简笔画装饰-->
+    <svg class="cloud-sketch" style="top:8%;right:18%;width:90px;height:50px;" viewBox="0 0 90 50">
+        <path d="M15 35 Q22 18 38 22 Q48 8 62 20 Q78 14 82 32 Q84 42 66 40 Q42 48 20 42 Q8 44 15 35Z"/>
+    </svg>
+    <svg class="cloud-sketch" style="top:65%;left:12%;width:72px;height:42px;" viewBox="0 0 90 50">
+        <path d="M15 35 Q22 18 38 22 Q48 8 62 20 Q78 14 82 32 Q84 42 66 40 Q42 48 20 42 Q8 44 15 35Z"/>
+    </svg>
+
+    <div class="page-title-wrap">
+        <div class="main-title">找橹橹成功</div>
+        <div class="sub-title">点击页面获得结局</div>
+    </div>
+
+    <div class="center-wrap">
+        <div class="opening-text">感谢你在众多孤星之中找到我</div>
+        <img class="main-img" src="./picture/yqh.jpg" alt="图片">
+        <div class="text-item">Its because of all your love</div>
+        <div class="text-item">杰杰高升</div>
+        <div class="text-item">不离不弃</div>
+    </div>
+
+    <div class="footer">创作@柚不是我的醋</div>
+
+    <script>
+        const bodyDom = document.body;
+        const openingText = document.querySelector('.opening-text');
+        const mainImg = document.querySelector('.main-img');
+        const textList = document.querySelectorAll('.text-item');
+        let triggered = false;
+
+        bodyDom.addEventListener('click', ()=>{
+            if(triggered) return;
+            triggered = true;
+
+            //全部统一1.2s淡入过渡，无弹窗，纯渐显时序
+            openingText.classList.add('show');
+            setTimeout(()=> mainImg.classList.add('show'), 1200);
+            setTimeout(()=> textList[0].classList.add('show'), 2400);
+            setTimeout(()=> textList[1].classList.add('show'), 3600);
+            setTimeout(()=> textList[2].classList.add('show'), 4800);
+        })
+    </script>
+</body>
+</html>

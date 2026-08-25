@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>✧ LuLu的日记 ✧</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: linear-gradient(160deg, #87ceeb 0%, #1a4b8c 100%);
+            min-height: 100vh;
+            font-family: "Microsoft Yahei", sans-serif;
+            color: #0b2b52;
+            padding: 30px 15px;
+            position: relative;
+            overflow-x: hidden;
+        }
+        /* 手绘风四芒星 */
+        .star4 {
+            position: absolute;
+            width: 28px;
+            height: 28px;
+            border: 2px solid #ffffffdd;
+            border-radius: 2px;
+            transform: rotate(45deg);
+            opacity: 0.8;
+            animation: twinkle 2.8s infinite alternate;
+        }
+        .star4::before,
+        .star4::after {
+            content: "";
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: #ffffffdd;
+            border-radius: 50%;
+        }
+        .star4::before {
+            top: -4px;
+            left: 10px;
+        }
+        .star4::after {
+            bottom: -4px;
+            right: 10px;
+        }
+        @keyframes twinkle {
+            0% { opacity: 0.3; transform: rotate(45deg) scale(0.8); }
+            100% { opacity: 1; transform: rotate(45deg) scale(1.15); }
+        }
+        /* 简笔画装饰容器 */
+        .sketch-deer,
+        .sketch-violin,
+        .sketch-mic,
+        .sketch-hat {
+            position: absolute;
+            width: 42px;
+            height: 42px;
+            opacity: 0.85;
+        }
+        .sketch-deer {
+            top: 14px;
+            right: 30px;
+        }
+        .sketch-violin {
+            bottom: 22px;
+            left: 24px;
+        }
+        .sketch-mic {
+            top: 32%;
+            left: 32px;
+        }
+        .sketch-hat {
+            bottom: 16%;
+            right: 36px;
+        }
+        h1 {
+            text-align: center;
+            color: #ffffff;
+            text-shadow: 0 0 12px #2060b0;
+            margin-bottom: 10px;
+            font-size: 2.3rem;
+        }
+        .subtitle {
+            text-align: center;
+            color: #f0f7ff;
+            margin-bottom: 40px;
+            font-size: 1.1rem;
+        }
+        .diary-wrap {
+            max-width: 720px;
+            margin: 0 auto;
+        }
+        .diary-item {
+            background: rgba(255, 255, 255, 0.88);
+            border-radius: 14px;
+            margin-bottom: 18px;
+            border: 2px solid #4488cc;
+            overflow: hidden;
+            box-shadow: 0 4px 14px #0f386955;
+        }
+        .diary-title {
+            padding: 16px 20px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1.05rem;
+            background: rgba(90, 155, 220, 0.22);
+            user-select: none;
+        }
+        .diary-content {
+            padding: 0 20px;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.45s ease;
+            line-height: 1.8;
+            font-size: 1rem;
+        }
+        .diary-content-inner {
+            padding: 20px 0;
+        }
+        .diary-item.open .diary-content {
+            max-height: 800px;
+        }
+        .diary-date {
+            font-size: 0.92rem;
+            color: #336699;
+            margin-bottom: 8px;
+        }
+        .diary-sub {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .emo-fixed {
+            margin-top: 10px;
+            font-size: 1.1rem;
+        }
+        /* 日记9弹窗 */
+        .malice-overlay {
+            position: fixed;
+            inset: 0;
+            background: #000000cc;
+            z-index: 9999;
+            display: none;
+        }
+        .malice-overlay.show {
+            display: block;
+        }
+        .popup-box {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #ffffffdd;
+            padding: 32px 42px;
+            border-radius: 12px;
+            font-size: 1.4rem;
+            z-index: 10001;
+            min-width: 320px;
+        }
+        .close-btn {
+            position: absolute;
+            top: 8px;
+            right: 10px;
+            border: none;
+            background: #c83c3c;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+        /* 恶意文字拍打动画 */
+        @keyframes slapIn {
+            0% { transform: translateY(-140px) scale(0.8); opacity: 0; }
+            60% { transform: translateY(12px) scale(1.05); }
+            100% { transform: translateY(0) scale(1); opacity: 1; }
+        }
+        .malice-text {
+            position: absolute;
+            color: #ff2222;
+            font-weight: 900;
+            font-size: 1.6rem;
+            text-shadow: 0 0 8px black;
+            animation: slapIn 0.65s ease-out forwards;
+            opacity: 0;
+            white-space: nowrap;
+        }
+        /* 简笔画眼睛 */
+        .sketch-eye {
+            position: absolute;
+            width: 32px;
+            height: 18px;
+            border: 2px solid #eeeeee;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.05);
+        }
+        .sketch-eye::after {
+            content: "";
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: #eeeeee;
+            border-radius: 50%;
+            top: 5px;
+            left: 12px;
+        }
+        /* 手绘线条装饰 */
+        .hand-line {
+            position: absolute;
+            width: 60px;
+            height: 3px;
+            background: #ffffff99;
+            border-radius: 2px;
+        }
+        /*页脚制作者信息*/
+        .footer-creator{
+            text-align:center;
+            margin-top:50px;
+            color:rgba(255,255,255,0.75);
+            font-size:14px;
+        }
+    </style>
+</head>
+<body>
+    <!-- 四芒星 -->
+    <div class="star4" style="top: 8%; left: 6%;"></div>
+    <div class="star4" style="top: 22%; right: 9%;"></div>
+    <div class="star4" style="top: 45%; left: 12%;"></div>
+    <div class="star4" style="top: 66%; right: 14%;"></div>
+    <div class="star4" style="top: 84%; left: 20%;"></div>
+    <!-- 简笔画装饰：小鹿 -->
+    <svg class="sketch-deer" viewBox="0 0 42 42" fill="none" stroke="#ffffffdd" stroke-width="2">
+        <path d="M21 12c-3 0-5 2-6 5l-3 6c-2 4-1 9 3 11h12c4-2 5-7 3-11l-3-6c-1-3-3-5-6-5z"/>
+        <path d="M17 8c-1-3-4-5-6-4M25 8c1-3 4-5 6-4"/>
+        <circle cx="18" cy="24" r="2"/>
+        <circle cx="24" cy="24" r="2"/>
+    </svg>
+    <!-- 简笔画装饰：小提琴 -->
+    <svg class="sketch-violin" viewBox="0 0 42 42" fill="none" stroke="#ffffffbb" stroke-width="2">
+        <path d="M21 8c-2 0-3 1-4 2l-1 4c-1 2-1 5 0 7l2 4c1 2 3 3 5 3s4-1 5-3l2-4c1-2 1-5 0-7l-1-4c-1-1-2-2-4-2z"/>
+        <line x1="21" y1="8" x2="21" y2="28"/>
+        <path d="M13 32c-2 3-3 5-2 7s3 2 5 1l5-3"/>
+        <path d="M29 32c2 3 3 5 2 7s-3 2-5 1l-5-3"/>
+    </svg>
+    <!-- 简笔画装饰：话筒 -->
+    <svg class="sketch-mic" viewBox="0 0 42 42" fill="none" stroke="#ffffffbb" stroke-width="2">
+        <rect x="16" y="8" width="10" height="14" rx="5"/>
+        <line x1="21" y1="22" x2="21" y2="32"/>
+        <path d="M15 32c0 3 3 6 6 6s6-3 6-6"/>
+    </svg>
+    <!-- 简笔画装饰：魔法帽 -->
+    <svg class="sketch-hat" viewBox="0 0 42 42" fill="none" stroke="#ffffffcc" stroke-width="2">
+        <path d="M21 6c-4 0-7 3-8 7l-2 6c-1 3 1 6 4 7l12 4c3 1 6-1 7-4l2-6c1-3-1-6-4-7l-12-4z"/>
+        <path d="M11 26c-3 1-5 3-5 5s2 3 5 4l10 3c3 1 7 1 10 0s5-2 5-4-2-4-5-5"/>
+    </svg>
+    <!-- 手绘线条 -->
+    <div class="hand-line" style="top: 18%; left: 28%; transform: rotate(12deg);"></div>
+    <div class="hand-line" style="bottom: 18%; right: 24%; transform: rotate(-8deg);"></div>
+    <h1>✧ LuLu的日记 ✧</h1>
+    <div class="subtitle">致那些温柔的时光</div>
+    <div class="diary-wrap">
+        <div class="diary-item" data-id="1">
+            <div class="diary-title">第1篇 · 2023年春</div>
+            <div class="diary-content">
+                <div class="diary-content-inner">
+                    <div class="diary-date">2023年春</div>
+                    <div class="diary-sub">新的开始</div>
+                    <div>今天我正式加入了TF家族。站在训练室门口的时候，我有点紧张，也有点期待。以后会有很多人喜欢我吗？我不知道，但我想先把每一次练习都做好。</div>
+                    <div class="emo-fixed">ヽ(✿ﾟ▽ﾟ)ノ</div>
+                </div>
+            </div>
+        </div>
+        <div class="diary-item" data-id="2">
+            <div class="diary-title">第2篇 · 加入后第三周</div>
+            <div class="diary-content">
+                <div class="diary-content-inner">
+                    <div class="diary-date">加入后第三周</div>
+                    <div class="diary-sub">一点点进步就好</div>
+                    <div>今天在成都分部练习了新的舞蹈，动作很快，节奏也很密，我练到镜子里的自己都有点喘。好难呀，我是不是不太适合跳舞？不过声乐老师说我音色不错，让我继续保持。没关系，一点点进步，一点点努力就好。</div>
+                    <div class="emo-fixed">(//▽//)</div>
+                </div>
+            </div>
+        </div>
+        <div class="diary-item" data-id="3">
+            <div class="diary-title">第3篇 · 初夏</div>
+            <div class="diary-content">
+                <div class="diary-content-inner">
+                    <div class="diary-sub">和大家集结了</div>
+                    <div class="diary-date">初夏</div>
+                    <div>今天和重庆总部的小伙伴们集结啦。大家都很热情，有人帮我拿水，有人跟我介绍训练室的位置。希望我能快些融入他们，也希望以后能和大家一起完成更多舞台。</div>
+                    <div class="emo-fixed">(≧∇≦)ﾉ</div>
+                </div>
+            </div>
+        </div>
+        <div class="diary-item" data-id="4">
+            <div class="diary-title">第4篇 · 七月份</div>
+            <div class="diary-content">
+                <div class="diary-content-inner">
+                    <div class="diary-date">七月份</div>
+                    <div class="diary-sub">第一次录物料</div>
+                    <div>记录第一次录制物料，现场比我想象中热闹很多。工作人员很耐心，小伙伴们也很会接话。不过我有时候好像不太敢说话，总怕自己说错话，也怕镜头前显得不自然。下次要再勇敢一点。</div>
+                    <div class="emo-fixed">(〃ﾉωﾉ)</div>
+                </div>
+            </div>
+        </div>
+        <div class="diary-item" data-id="5">
+            <div class="diary-title">第5篇 · 八月</div>
+            <div class="diary-content">
+                <div class="diary-content-inner">
+                    <div class="diary-date">八月</div>
+                    <div class="diary-sub">外景剧本杀</div>
+                    <div>出外景啦！今天玩的是剧本杀，环境布置得很有氛围，灯光一暗，我立刻就进入角色了。我抽中的是个女孩子，叫杜小景，人设很有意思。就是太黑了，老师说我的嘴巴一直在碎碎念，我也没有很害怕呀！</div>
+                    <div class="emo-fixed">(✿◡‿◡)</div>
+                </div>
+            </div>
+        </div>
+        <div class="diary-item" data-id="6">
+            <div class="diary-title">第6篇 · 秋日公演</div>
+            <div class="diary-content">
+                <div class="diary-content-inner">
+                    <div class="diary-date">秋日公演</div>
+                    <div class="diary-sub">公演结束啦</div>
+                    <div>公演结束啦！人好多啊，现场几乎全都坐满了。上台前我手心一直在冒汗，听到音乐响起的时候，反而慢慢镇定下来了。还好没有愧对喜欢我的那些姐姐们。虽然还是会紧张和害羞，但我会尽力克服。</div>
+                    <div class="emo-fixed">(；≡；)</div>
+                </div>
+            </div>
+        </div>
+        <div class="diary-item" data-id="7">
+            <div class="diary-title">第7篇 · 初冬</div>
+            <div class="diary-content">
+                <div class="diary-content-inner">
+                    <div class="diary-date">初冬</div>
+                    <div class="diary-sub">好久没写了</div>
+                    <div>这个日记网站我都快忘记了。好久没写，每天都好忙，学习、训练、小提琴，一件接一件排得很满。今天听到工作人员说我好像上热搜了，我当时愣了一下，不知道是好是坏。不过先做好自己吧，别的以后再说。</div>
+                    <div class="emo-fixed">(´_ゝ`)</div>
+                </div>
+            </div>
+        </div>
+        <div class="diary-item" data-id="8">
+            <div class="diary-title">第8篇 · 深冬</div>
+            <div class="diary-content">
+                <div class="diary-content-inner">
+                    <div class="diary-date">深冬</div>
+                    <div class="diary-sub">被误会了</div>
+                    <div>他们好像误会我了。截图、片段、只言片语，都能被理解成另一个样子。我看着那些话，突然不知道该怎么解释。不过被误会是表达者的宿命，算了。也许时间会慢慢把事情说清楚。</div>
+                    <div class="emo-fixed">(｡•́︿•̀｡)</div>
+                </div>
+            </div>
+        </div>
+        <div class="diary-item" data-id="9">
+            <div class="diary-title">第9篇 · 一个寒冷的夜晚</div>
+            <div class="diary-content">
+                <div class="diary-content-inner">
+                    <div class="diary-date">一个寒冷的夜晚</div>
+                    <div class="diary-sub">我做错什么了吗？</div>
+                    <div>窗外很黑，手机屏幕亮得刺眼。我看到很多陌生的名字，很多指责，很多没有来由的讨厌。我只是想好好训练，好好站上舞台，好好表达自己。可是为什么会变成这样？我做错什么了吗？</div>
+                    <div class="emo-fixed">(´；ω；`)</div>
+                </div>
+            </div>
+        </div>
+        <!--新增日记10-->
+        <div class="diary-item" data-id="10">
+            <div class="diary-title">第10篇 · 寒夜之后</div>
+            <div class="diary-content">
+                <div class="diary-content-inner">
+                    <div class="diary-date">寒夜之后</div>
+                    <div class="diary-sub">云LuLu的新账号</div>
+                    <div>在云LuLu注册了一个新账号，密码是荧光闪烁.强光，首字母都要大写，中间有空格。想Lumos的时候就会用这个账号在云LuLu点单。好像这样，距离就可以稍微近一点点。</div>
+                    <div class="emo-fixed">⋆˚✿˖°</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--页脚制作者署名-->
+    <div class="footer-creator">制作者：@柚不是我的醋</div>
+    <div class="malice-overlay" id="maliceOverlay">
+        <div class="popup-box">
+            <button class="close-btn" id="closeBtn">×关闭</button>
+            <div>我做错什么了吗？</div>
+        </div>
+    </div>
+    <script>
+        document.querySelectorAll('.diary-item:not([data-id="9"])').forEach(item => {
+            const title = item.querySelector('.diary-title');
+            title.addEventListener('click', () => {
+                item.classList.toggle('open');
+            });
+        });
+        const diary9 = document.querySelector('[data-id="9"]');
+        const overlay = document.getElementById('maliceOverlay');
+        const closeBtn = document.getElementById('closeBtn');
+        const badWords = [
+            "壁纸哥",
+            "lm99",
+            "靠壁纸飞升",
+            "麦麸飞升爽不爽",
+            "下楼",
+            "丹麦",
+            "别装无辜了",
+            "你真的很假",
+            "能不能别蹭了",
+            "看着就不舒服",
+            "说话好茶艺",
+            "别卖惨了",
+            "谁在乎你委屈",
+            "快下楼吧",
+            "别拖别人下水",
+            "眼神戏太多",
+            "真会塑造人设",
+            "别靠别人上位",
+            "假真诚最可怕",
+            "闭嘴吧你"
+        ];
+        let barrageFinished = false;
+        let isFirstClose = true;
+        diary9.querySelector('.diary-title').addEventListener('click', () => {
+            diary9.classList.add('open');
+            overlay.classList.add('show');
+            barrageFinished = false;
+            isFirstClose = true;
+            overlay.querySelectorAll(".malice-text, .sketch-eye").forEach(el => el.remove());
+        });
+        closeBtn.addEventListener('click', async () => {
+            if (isFirstClose && !barrageFinished) {
+                isFirstClose = false;
+                for (let i = 0; i < badWords.length; i++) {
+                    let txt = document.createElement('div');
+                    txt.className = "malice-text";
+                    txt.innerText = badWords[i];
+                    txt.style.left = Math.random() * 80 + "%";
+                    txt.style.top = Math.random() * 80 + "%";
+                    overlay.appendChild(txt);
+                    await sleep(180);
+                }
+                for (let i = 0; i < 32; i++) {
+                    let eyeDom = document.createElement('div');
+                    eyeDom.className = "sketch-eye";
+                    eyeDom.style.left = Math.random() * 92 + "%";
+                    eyeDom.style.top = Math.random() * 92 + "%";
+                    overlay.appendChild(eyeDom);
+                    await sleep(80);
+                }
+                barrageFinished = true;
+                return;
+            }
+            if (barrageFinished) {
+                overlay.classList.remove('show');
+            }
+        });
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+    </script>
+</body>
+</html>
